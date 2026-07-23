@@ -1,0 +1,204 @@
+<meta charset="utf-8">
+<title>Developer Onboarding &amp; Joining Flow — VTC Summary</title>
+<style>
+  :root{
+    --bg:#f7f8fa; --panel:#ffffff; --ink:#1c2230; --muted:#5b6472;
+    --line:#e2e6ee; --accent:#3454d1; --accent-soft:#eaeefc;
+    --p1:#3454d1; --p2:#0e9f6e; --p3:#d97706; --p4:#9333ea;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0f1420; --panel:#161c2b; --ink:#e8ecf5; --muted:#9aa4b6;
+      --line:#28304380; --accent:#7e97ff; --accent-soft:#1c2540;
+      --p1:#7e97ff; --p2:#41d69a; --p3:#f0a94a; --p4:#c084fc;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:960px;margin:0 auto;padding:48px 24px 80px}
+  header.doc{border-bottom:2px solid var(--line);padding-bottom:22px;margin-bottom:32px}
+  .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  h1{font-size:30px;line-height:1.2;margin:.3em 0 .2em}
+  .sub{color:var(--muted);font-size:15px}
+  .note{background:var(--accent-soft);border:1px solid var(--line);border-left:4px solid var(--accent);
+    border-radius:8px;padding:14px 18px;margin:22px 0;font-size:14.5px;color:var(--ink)}
+  h2{font-size:22px;margin:44px 0 12px;padding-top:8px}
+  h3{font-size:16px;margin:26px 0 8px}
+  p{margin:.6em 0}
+  .lead{font-size:17px;color:var(--ink)}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px 24px;margin:18px 0;
+    box-shadow:0 1px 2px rgba(20,30,60,.04)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:16px 0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+  .card .tag{font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--accent)}
+  .card h4{margin:4px 0 6px;font-size:15px}
+  .card p{margin:0;font-size:13.5px;color:var(--muted);line-height:1.5}
+  .phase-row{display:flex;gap:14px;align-items:flex-start;margin:14px 0;padding:16px 18px;
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;border-left:4px solid var(--pc)}
+  .phase-row .num{flex:0 0 auto;width:34px;height:34px;border-radius:8px;display:grid;place-items:center;
+    font-weight:800;color:#fff;background:var(--pc)}
+  .phase-row h4{margin:2px 0 4px;font-size:15.5px}
+  .phase-row p{margin:0;font-size:14px;color:var(--muted)}
+  .p1{--pc:var(--p1)} .p2{--pc:var(--p2)} .p3{--pc:var(--p3)} .p4{--pc:var(--p4)}
+  .diagram{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;margin:20px 0;overflow-x:auto}
+  .diagram .cap{font-size:12.5px;color:var(--muted);margin-bottom:10px;text-align:center;letter-spacing:.03em}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+  code{background:var(--accent-soft);padding:1px 6px;border-radius:5px;font-size:13px}
+  ul{margin:.4em 0;padding-left:1.2em}
+  li{margin:.25em 0}
+  footer{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
+  .req{display:inline-block;background:var(--accent-soft);border:1px solid var(--line);border-radius:20px;
+    padding:2px 11px;font-size:12.5px;margin:3px 4px 0 0}
+</style>
+
+<div class="wrap">
+<header class="doc">
+  <div class="kicker">VTC Onboarding · Research Summary</div>
+  <h1>Onboarding &amp; Joining Flow for Developers</h1>
+  <div class="sub">High-level summary of <em>Bootstrapping a Verifiable Trust Community</em> (V1, 2025-12-19), framed for a kernel-style developer community.</div>
+</header>
+
+<div class="note">
+  <strong>Why this exists.</strong> This is a condensed, high-level view of the source design, prepared for the team evaluating the best onboarding experience on the <strong>VTI stack</strong>. It keeps only the joining flow and the major components — deep credential mechanics are intentionally left out. The source's example policies are explicitly modeled on what a Linux-kernel-style community wants, which is why it maps cleanly to developer onboarding.
+</div>
+
+<p class="lead">The goal is a community where every developer is a <strong>verified, real person</strong>, relationships between developers are <strong>cryptographically vouched</strong>, and there are <strong>clear rules for who can join and who can invite</strong>. Unlike an open sign-up (where anyone can spin up fake accounts), membership is earned through layered trust — nobody joins without being vouched for.</p>
+
+<h2>The core idea: trust grows in layers</h2>
+<p>The community expands outward from a single origin, and each layer has <strong>stronger joining requirements</strong> than the last. This keeps the community secure while still allowing organic, self-service growth once it's established.</p>
+
+<div class="diagram">
+  <div class="cap">How trust propagates — founder → anchors → vouched members → verified members</div>
+  <pre class="mermaid">
+flowchart LR
+  F["🌱 Founder<br/>(Founding Trust Anchor)"] --> A["🔑 Trust Anchors<br/>(trusted maintainers)"]
+  A --> M["✅ Vouched Members<br/>(web-of-trust developers)"]
+  M --> V["🛡️ Verified Members<br/>(vouched + ID-checked)"]
+  V -.->|invite more| V
+  classDef f fill:#3454d1,stroke:#3454d1,color:#fff
+  classDef a fill:#0e9f6e,stroke:#0e9f6e,color:#fff
+  classDef m fill:#d97706,stroke:#d97706,color:#fff
+  classDef v fill:#9333ea,stroke:#9333ea,color:#fff
+  class F f
+  class A a
+  class M m
+  class V v
+  </pre>
+</div>
+
+<h2>The four phases of joining</h2>
+<p>Onboarding is not one flow — it evolves as the community matures. Each phase unlocks a new tier of people who are allowed to invite, and a new bar for newcomers to clear.</p>
+
+<div class="phase-row p1">
+  <div class="num">1</div>
+  <div>
+    <h4>Genesis — the community is created</h4>
+    <p>One founder instantiates the community and automatically becomes the first member. They set the initial rules for who can join. No onboarding of others yet — this is the seed.</p>
+  </div>
+</div>
+<div class="phase-row p2">
+  <div class="num">2</div>
+  <div>
+    <h4>Founder invites Trust Anchors</h4>
+    <p>The founder invites a small, hand-picked group of trusted people (the maintainers who will grow the community responsibly). They exchange verified credentials to confirm the relationship. <strong>Bar to join: a direct invitation from the founder.</strong></p>
+  </div>
+</div>
+<div class="phase-row p3">
+  <div class="num">3</div>
+  <div>
+    <h4>Trust Anchors invite Members</h4>
+    <p>Anchors can now bring in developers. A newcomer needs <strong>an invitation from one anchor <em>and</em> a vouched connection with at least one other anchor</strong>. This is where the "web of trust" begins — more than one person must stand behind a newcomer.</p>
+  </div>
+</div>
+<div class="phase-row p4">
+  <div class="num">4</div>
+  <div>
+    <h4>Members invite Members (organic growth)</h4>
+    <p>Regular members can now invite others, so the community self-sustains. The bar is highest here: <strong>one invitation, vouched connections with at least two other members, <em>and</em> professional identity verification</strong> (an independent ID check).</p>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="card"><div class="tag">PHASE 2 — TO JOIN</div><h4>Anchor</h4><p><span class="req">1 founder invite</span></p></div>
+  <div class="card"><div class="tag">PHASE 3 — TO JOIN</div><h4>Member</h4><p><span class="req">1 anchor invite</span> <span class="req">+ 1 anchor vouch</span></p></div>
+  <div class="card"><div class="tag">PHASE 4 — TO JOIN</div><h4>Verified Member</h4><p><span class="req">1 member invite</span> <span class="req">+ 2 member vouches</span> <span class="req">+ ID check</span></p></div>
+</div>
+
+<h2>A developer's join journey</h2>
+<p>Below is the steady-state experience for a new developer (call them <strong>Bob</strong>) joining an established community — the Phase 4 flow, which is the one researchers should optimize for since it's how most people will actually onboard.</p>
+
+<div class="diagram">
+  <div class="cap">New developer joining an established community (high level)</div>
+  <pre class="mermaid">
+sequenceDiagram
+  autonumber
+  actor Bob as New Developer (Bob)
+  participant Alice as Existing Member (inviter)
+  participant Peers as 2+ Other Members
+  participant IdV as Identity Verifier
+  participant VTC as Community (rules + registry)
+
+  Alice->>Bob: Sends invitation
+  Bob->>Alice: Establishes vouched connection
+  Bob->>Peers: Establishes vouched connections (×2+)
+  Bob->>IdV: Requests identity check (authorized by invite)
+  IdV->>Bob: Confirms real identity → issues ID credential
+  Bob->>VTC: Presents invite + vouches + ID proof
+  VTC->>VTC: Checks rules & registry
+  VTC->>Bob: Issues membership → Bob is now a member
+  Note over Bob,VTC: Bob can now invite others (loop continues)
+  </pre>
+</div>
+
+<p>The key experience insight for the VTI stack: joining is a <strong>gather-then-present</strong> flow. A newcomer collects a few things — an invite, a couple of peer vouches, and an ID check — then presents them once, and the community's rules engine decides automatically. There is no manual gatekeeper approving each person; the policy does the work.</p>
+
+<h2>Major components</h2>
+<p>These are the building blocks the VTI stack needs to support. Grouped by role — <em>who</em> the actors are, <em>what</em> gets exchanged, and the <em>machinery</em> that enforces the rules.</p>
+
+<h3>Actors</h3>
+<div class="grid">
+  <div class="card"><div class="tag">FTA</div><h4>Founding Trust Anchor</h4><p>The person who starts the community and becomes its first member. Seeds the initial rules.</p></div>
+  <div class="card"><div class="tag">CTA</div><h4>Community Trust Anchor</h4><p>A trusted maintainer, invited by the founder, allowed to bring in new members.</p></div>
+  <div class="card"><div class="tag">VCM</div><h4>Verifiable Community Member</h4><p>A developer who was invited, met the rules, and holds a membership credential.</p></div>
+  <div class="card"><div class="tag">IdV</div><h4>Identity Verifier</h4><p>An independent, commercial ID-proofing provider (e.g. the "background check" step in Phase 4).</p></div>
+</div>
+
+<h3>What developers hold &amp; exchange</h3>
+<div class="grid">
+  <div class="card"><div class="tag">M-DID</div><h4>Member Identity</h4><p>A developer's unique verifiable identity within the community — the anchor for everything else they hold.</p></div>
+  <div class="card"><div class="tag">Invitation</div><h4>Invite Credential</h4><p>Proof that an existing member invited this person to join (the CIC/VIC pair in the source).</p></div>
+  <div class="card"><div class="tag">Vouch</div><h4>Peer Relationship Credential</h4><p>A cryptographic "I know and trust this person" link — the threads of the web of trust (VRC).</p></div>
+  <div class="card"><div class="tag">ID Proof</div><h4>Identity Credential</h4><p>Result of the professional identity check, required at the Phase 4 tier (IDVC).</p></div>
+  <div class="card"><div class="tag">Membership</div><h4>Membership Credential</h4><p>The community's verifiable "you are a member" credential, issued once the rules are met (VMC).</p></div>
+</div>
+
+<h3>Community machinery</h3>
+<div class="grid">
+  <div class="card"><div class="tag">PEP</div><h4>Policy Engine</h4><p>Holds and enforces the joining rules — decides automatically whether a newcomer qualifies.</p></div>
+  <div class="card"><div class="tag">TR</div><h4>Trust Registry</h4><p>The record of who is a member and what role they hold; consulted when verifying anyone.</p></div>
+  <div class="card"><div class="tag">Protocols</div><h4>Exchange &amp; Policy Protocols</h4><p>Standard flows for exchanging vouches between peers and for updating the community's rules.</p></div>
+</div>
+
+<h2>Takeaways for the VTI-stack experience study</h2>
+<div class="panel">
+<ul>
+  <li><strong>Optimize the Phase 4 flow.</strong> It's the steady-state path most developers will take, and it has the most steps (invite → vouches → ID check → present). Friction here defines the onboarding experience.</li>
+  <li><strong>The hard UX problem is "gather-then-present."</strong> A newcomer must collect several credentials from different parties before the single join moment. Making that collection feel guided rather than like a scavenger hunt is the core experience challenge.</li>
+  <li><strong>Vouching is social, not technical.</strong> Requiring 2+ peer vouches means onboarding depends on a newcomer already having relationships. The experience needs to help newcomers find and request vouches.</li>
+  <li><strong>Rules do the gatekeeping, not people.</strong> Acceptance is automatic once proofs check out — so the experience should make the requirements transparent up front ("here's exactly what you still need").</li>
+  <li><strong>Identity can stay pseudonymous.</strong> The ID check confirms a real person exists without necessarily exposing a legal name to the community — relevant for how much a kernel developer must reveal.</li>
+  <li><strong>Note the source's open items:</strong> where the community "lives" (local founder machine → hosted service) and how identity credentials are actually trusted were still marked <code>TODO</code> in the original — worth flagging as open design questions.</li>
+</ul>
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  const dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  mermaid.initialize({startOnLoad:true, theme: dark ? 'dark' : 'default', securityLevel:'loose',
+    flowchart:{curve:'basis'}, themeVariables:{fontFamily:'-apple-system,Segoe UI,Roboto,sans-serif'}});
+</script>
